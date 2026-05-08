@@ -77,3 +77,6 @@ npm run build
 ---
 *Креирано за потребе ефикасније администрације у средњим школама.*
 *Created for more efficient high school administration.*
+
+
+autor
