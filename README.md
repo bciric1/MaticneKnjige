@@ -79,4 +79,4 @@ npm run build
 *Created for more efficient high school administration.*
 
 
-autor Bojan Ciric
+autor Bojan Ciric 
