@@ -1,0 +1,54 @@
+import { Book, PlusCircle, LayoutDashboard, Settings2, Upload, Download, FileJson } from 'lucide-react';
+
+interface NavbarProps {
+  onHome: () => void;
+  onAdd: () => void;
+  onCalibration: () => void;
+  onImport: () => void;
+  onExportJson?: () => void;
+  onImportJson?: () => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ onHome, onAdd, onCalibration, onImport, onExportJson, onImportJson }) => {
+  return (
+    <nav className="app-navbar no-print">
+      <div className="navbar-brand" onClick={onHome}>
+        <div className="brand-icon"><Book size={22} /></div>
+        <div>
+          <span className="brand-title">Матична Књига</span>
+          <span className="brand-sub">Ученика</span>
+        </div>
+      </div>
+      <div className="navbar-actions">
+        <button onClick={onHome} className="nav-btn ghost">
+          <LayoutDashboard size={17} />
+          Почетна
+        </button>
+        <button onClick={onCalibration} className="nav-btn ghost">
+          <Settings2 size={17} />
+          Подешавање штампе
+        </button>
+        <button onClick={onImport} className="nav-btn ghost">
+          <Upload size={17} />
+          Увези из еДневника
+        </button>
+        {onExportJson && (
+          <button onClick={onExportJson} className="nav-btn ghost" title="Сними све податке у JSON фајл">
+            <Download size={17} />
+            Сними JSON
+          </button>
+        )}
+        {onImportJson && (
+          <button onClick={onImportJson} className="nav-btn ghost" title="Учитај податке из JSON фајла">
+            <FileJson size={17} />
+            Учитај JSON
+          </button>
+        )}
+        <button onClick={onAdd} className="nav-btn primary">
+          <PlusCircle size={17} />
+          Нови Ученик
+        </button>
+      </div>
+    </nav>
+  );
+};
