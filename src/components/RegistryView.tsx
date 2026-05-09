@@ -256,10 +256,17 @@ export const RegistryView: React.FC<Props> = ({ student, onBack }) => {
                     {!hiddenFields.has('enr_smer') && <CalibField calib={calib} id="enr_smer" val={cleanStr(student.smer)} />}
                     {!hiddenFields.has('enr_jisp') && <CalibField calib={calib} id="enr_jisp" val={cleanStr(student.jispProgram)} />}
                     {!hiddenFields.has('enr_duration') && <CalibField calib={calib} id="enr_duration" val={student.trajanjeObrazovanjaGodina} />}
-                    {!hiddenFields.has('enr_class_roman') && <CalibField calib={calib} id="enr_class_roman" val={student.razredi?.[1]?.razred || ''} />}
                     {!hiddenFields.has('status_redovan') && <CalibField calib={calib} id="status_redovan" val={(student.jmbg && student.jmbg.length === 13 && parseInt(student.jmbg.charAt(9)) >= 5) ? 'редовна' : 'редован'} />}
-                    {!hiddenFields.has('skolska_godina_1') && <CalibField calib={calib} id="skolska_godina_1" val={(student.razredi?.[1]?.skolskaGodina || '2025/2026').split(/[\/\-]/)[0] || '2025'} />}
-                    {!hiddenFields.has('skolska_godina_2') && <CalibField calib={calib} id="skolska_godina_2" val={(student.razredi?.[1]?.skolskaGodina || '2025/2026').split(/[\/\-]/)[1] || '2026'} />}
+                    {years.map(y => {
+                      const r = getRazred(student, y);
+                      return (
+                        <React.Fragment key={`hdr_y${y}`}>
+                          {!hiddenFields.has(`hdr_y${y}_razred`) && <CalibField calib={calib} id={`hdr_y${y}_razred`} val={r?.razred || ''} />}
+                          {!hiddenFields.has(`hdr_y${y}_god1`) && <CalibField calib={calib} id={`hdr_y${y}_god1`} val={(r?.skolskaGodina || '').split(/[\/\-]/)[0]} />}
+                          {!hiddenFields.has(`hdr_y${y}_god2`) && <CalibField calib={calib} id={`hdr_y${y}_god2`} val={(r?.skolskaGodina || '').split(/[\/\-]/)[1] || ''} />}
+                        </React.Fragment>
+                      );
+                    })}
 
                     {!hiddenFields.has('grades_subjects') && (
                       <div className="calib-field-print no-border" style={{ left: `${calib['grades_subjects']?.x ?? 20}mm`, top: `${calib['grades_subjects']?.y ?? 150}mm`, position: 'absolute' }}>

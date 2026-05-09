@@ -29,10 +29,22 @@ const FIELDS = [
   { id: 'enr_smer', label: 'Смер', x: 110, y: 132, page: 1 },
   { id: 'enr_jisp', label: 'ЈИСП програм', x: 110, y: 138, page: 1 },
   { id: 'enr_duration', label: 'Трајање (год)', x: 250, y: 126, page: 1 },
-  { id: 'enr_class_roman', label: 'Разред (римски)', x: 100, y: 130, page: 1 },
   { id: 'status_redovan', label: 'Статус (редован/на)', x: 100, y: 140, page: 1 },
-  { id: 'skolska_godina_1', label: 'Школска година 1 (нпр. 2025)', x: 150, y: 140, page: 1 },
-  { id: 'skolska_godina_2', label: 'Школска година 2 (нпр. 2026)', x: 180, y: 140, page: 1 },
+  { id: 'hdr_y1_god1', label: 'Година 1 (I год)', x: 140, y: 140, page: 1 },
+  { id: 'hdr_y1_god2', label: 'Година 2 (I год)', x: 145, y: 140, page: 1 },
+  { id: 'hdr_y1_razred', label: 'Разред римски (I год)', x: 140, y: 145, page: 1 },
+
+  { id: 'hdr_y2_god1', label: 'Година 1 (II год)', x: 165, y: 140, page: 1 },
+  { id: 'hdr_y2_god2', label: 'Година 2 (II год)', x: 170, y: 140, page: 1 },
+  { id: 'hdr_y2_razred', label: 'Разред римски (II год)', x: 165, y: 145, page: 1 },
+
+  { id: 'hdr_y3_god1', label: 'Година 1 (III год)', x: 190, y: 140, page: 1 },
+  { id: 'hdr_y3_god2', label: 'Година 2 (III год)', x: 195, y: 140, page: 1 },
+  { id: 'hdr_y3_razred', label: 'Разред римски (III год)', x: 190, y: 145, page: 1 },
+
+  { id: 'hdr_y4_god1', label: 'Година 1 (IV год)', x: 215, y: 140, page: 1 },
+  { id: 'hdr_y4_god2', label: 'Година 2 (IV год)', x: 220, y: 140, page: 1 },
+  { id: 'hdr_y4_razred', label: 'Разред римски (IV год)', x: 215, y: 145, page: 1 },
   
   { id: 'grades_subjects', label: 'Списак предмета', x: 20, y: 150, page: 1 },
   { id: 'grades_y1', label: 'Оцене I год', x: 140, y: 150, page: 1 },
@@ -81,17 +93,28 @@ function getMockValue(id: string, student: Student) {
     case 'pers_parents': return student.imeRoditeljaStaratelja || 'Име Родитеља';
     case 'enr_school': return student.skolaUpisa || 'Назив школе';
     case 'enr_class': return student.razredUpisa || 'I-1';
-    case 'enr_class_roman': return student.razredi?.[1]?.razred || 'I';
     case 'enr_profile': return student.obrazovniProfilSmer || 'Електротехничар';
     case 'enr_smer': return student.smer || 'Рачунари';
     case 'enr_jisp': return student.jispProgram || '123456';
     case 'enr_duration': return student.trajanjeObrazovanjaGodina?.toString() || '4';
     case 'status_redovan': 
       return (student.jmbg && student.jmbg.length === 13 && parseInt(student.jmbg.charAt(9)) >= 5) ? 'редовна' : 'редован';
-    case 'skolska_godina_1':
-      return (student.razredi?.[1]?.skolskaGodina || '2025/2026').split(/[\/\-]/)[0] || '2025';
-    case 'skolska_godina_2':
-      return (student.razredi?.[1]?.skolskaGodina || '2025/2026').split(/[\/\-]/)[1] || '2026';
+
+    case 'hdr_y1_god1': return '2025';
+    case 'hdr_y1_god2': return '2026';
+    case 'hdr_y1_razred': return 'I';
+    
+    case 'hdr_y2_god1': return '2026';
+    case 'hdr_y2_god2': return '2027';
+    case 'hdr_y2_razred': return 'II';
+    
+    case 'hdr_y3_god1': return '2027';
+    case 'hdr_y3_god2': return '2028';
+    case 'hdr_y3_razred': return 'III';
+    
+    case 'hdr_y4_god1': return '2028';
+    case 'hdr_y4_god2': return '2029';
+    case 'hdr_y4_razred': return 'IV';
     case 'grades_subjects': return 'Списак предмета...';
     case 'grades_y1': return 'Оцене I год';
     case 'grades_y2': return 'Оцене II год';
