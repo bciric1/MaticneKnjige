@@ -118,12 +118,22 @@ export const RegistryView: React.FC<Props> = ({ student, onBack }) => {
   });
 
   const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set(['enr_school', 'enr_smer', 'enr_jisp']));
+  const [hiddenItems, setHiddenItems] = useState<Set<string>>(new Set());
 
   const toggleField = (id: string) => {
     setHiddenFields(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleItem = (key: string) => {
+    setHiddenItems(prev => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
       return next;
     });
   };
@@ -272,9 +282,21 @@ export const RegistryView: React.FC<Props> = ({ student, onBack }) => {
                       <div className="calib-field-print no-border" style={{ left: `${calib['grades_subjects']?.x ?? 20}mm`, top: `${calib['grades_subjects']?.y ?? 150}mm`, position: 'absolute' }}>
                         <table className="no-border">
                           <tbody>
-                            {subjects.map((subj, i) => (
-                              <tr key={i} style={{ height: `${calib.gradesRowHeight || 6.5}mm` }}><td className="td-subj">{subj}</td></tr>
-                            ))}
+                            {subjects.map((subj, i) => {
+                              const isHidden = hiddenItems.has(`subj_${i}`);
+                              return (
+                                <tr key={i} style={{ height: `${calib.gradesRowHeight || 6.5}mm` }}>
+                                  <td 
+                                    className="td-subj" 
+                                    style={{ cursor: 'pointer', opacity: isHidden ? 0 : 1 }}
+                                    onClick={() => toggleItem(`subj_${i}`)}
+                                    title="Kliknite da sakrijete/prikažete ovaj predmet"
+                                  >
+                                    {subj}
+                                  </td>
+                                </tr>
+                              );
+                            })}
                           </tbody>
                         </table>
                       </div>
@@ -292,9 +314,17 @@ export const RegistryView: React.FC<Props> = ({ student, onBack }) => {
                               else if (rawGrade === '2') formattedGrade = 'довољан (2)';
                               else if (rawGrade === '1') formattedGrade = 'недовољан (1)';
 
+                              const isHidden = hiddenItems.has(`grade_${y}_${i}`);
                               return (
                                 <tr key={i} style={{ height: `${calib.gradesRowHeight || 6.5}mm` }}>
-                                  <td className="td-gr" style={{ textAlign: 'center', whiteSpace: 'nowrap' }}>{formattedGrade}</td>
+                                  <td 
+                                    className="td-gr" 
+                                    style={{ textAlign: 'center', whiteSpace: 'nowrap', cursor: 'pointer', opacity: isHidden ? 0 : 1 }}
+                                    onClick={() => toggleItem(`grade_${y}_${i}`)}
+                                    title="Kliknite da sakrijete/prikažete ovu ocenu"
+                                  >
+                                    {formattedGrade}
+                                  </td>
                                 </tr>
                               );
                             })}
