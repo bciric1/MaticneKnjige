@@ -117,6 +117,20 @@
 .td-subj { font-family: "Times New Roman", serif; font-size: 11pt; font-weight: bold; }
 .td-gr { font-family: "Times New Roman", serif; font-size: 11pt; font-weight: bold; }
 
+@media screen {
+  .hide-on-print {
+    opacity: 0.2;
+    text-decoration: line-through;
+    color: red;
+  }
+}
+
+@media print {
+  .hide-on-print {
+    visibility: hidden !important;
+  }
+}
+
 .overlay-canvas {
   position: relative;
   overflow: hidden;

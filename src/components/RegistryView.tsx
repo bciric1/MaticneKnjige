@@ -287,8 +287,8 @@ export const RegistryView: React.FC<Props> = ({ student, onBack }) => {
                               return (
                                 <tr key={i} style={{ height: `${calib.gradesRowHeight || 6.5}mm` }}>
                                   <td 
-                                    className="td-subj" 
-                                    style={{ cursor: 'pointer', opacity: isHidden ? 0 : 1 }}
+                                    className={`td-subj ${isHidden ? 'hide-on-print' : ''}`} 
+                                    style={{ cursor: 'pointer' }}
                                     onClick={() => toggleItem(`subj_${i}`)}
                                     title="Kliknite da sakrijete/prikažete ovaj predmet"
                                   >
@@ -318,8 +318,8 @@ export const RegistryView: React.FC<Props> = ({ student, onBack }) => {
                               return (
                                 <tr key={i} style={{ height: `${calib.gradesRowHeight || 6.5}mm` }}>
                                   <td 
-                                    className="td-gr" 
-                                    style={{ textAlign: 'center', whiteSpace: 'nowrap', cursor: 'pointer', opacity: isHidden ? 0 : 1 }}
+                                    className={`td-gr ${isHidden ? 'hide-on-print' : ''}`} 
+                                    style={{ textAlign: 'center', whiteSpace: 'nowrap', cursor: 'pointer' }}
                                     onClick={() => toggleItem(`grade_${y}_${i}`)}
                                     title="Kliknite da sakrijete/prikažete ovu ocenu"
                                   >
