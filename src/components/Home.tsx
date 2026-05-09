@@ -145,7 +145,7 @@ const SCRAPER_CODE = `(async function () {
         alert("✅ Kopirano!");
     };
     overlay.querySelector('#close-btn').onclick = () => document.body.removeChild(overlay);
-})();`;
+})();\`;
 
 interface HomeProps {
   onStartTool: () => void;
