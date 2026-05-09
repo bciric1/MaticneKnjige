@@ -117,14 +117,28 @@ export const RegistryView: React.FC<Props> = ({ student, onBack }) => {
     return DEFAULT_CALIB;
   });
 
-  const [hiddenFields, setHiddenFields] = useState<Set<string>>(new Set(['enr_school', 'enr_smer', 'enr_jisp']));
-  const [hiddenItems, setHiddenItems] = useState<Set<string>>(new Set());
+  const [hiddenFields, setHiddenFields] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem('maticna_hidden_fields');
+      if (saved) return new Set(JSON.parse(saved));
+    } catch(e) {}
+    return new Set(['enr_school', 'enr_smer', 'enr_jisp']);
+  });
+  
+  const [hiddenItems, setHiddenItems] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem('maticna_hidden_items');
+      if (saved) return new Set(JSON.parse(saved));
+    } catch(e) {}
+    return new Set();
+  });
 
   const toggleField = (id: string) => {
     setHiddenFields(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
       else next.add(id);
+      localStorage.setItem('maticna_hidden_fields', JSON.stringify(Array.from(next)));
       return next;
     });
   };
@@ -134,6 +148,7 @@ export const RegistryView: React.FC<Props> = ({ student, onBack }) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
       else next.add(key);
+      localStorage.setItem('maticna_hidden_items', JSON.stringify(Array.from(next)));
       return next;
     });
   };
@@ -279,7 +294,7 @@ export const RegistryView: React.FC<Props> = ({ student, onBack }) => {
                     })}
 
                     {!hiddenFields.has('grades_subjects') && (
-                      <div className="calib-field-print no-border" style={{ left: `${calib['grades_subjects']?.x ?? 20}mm`, top: `${calib['grades_subjects']?.y ?? 150}mm`, position: 'absolute' }}>
+                      <div className="calib-field-print no-border" style={{ left: `${calib['grades_subjects']?.x ?? 20}mm`, top: `${calib['grades_subjects']?.y ?? 150}mm`, position: 'absolute', pointerEvents: 'auto' }}>
                         <table className="no-border">
                           <tbody>
                             {subjects.map((subj, i) => {
