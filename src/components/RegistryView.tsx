@@ -211,10 +211,14 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
         <div className="rv-t-left">
           <button className="btn-icon" onClick={onBack} title="Назад"><ArrowLeft size={20}/></button>
           <h1>{student.prezime} {student.ime} (Страна {currentPage})</h1>
-          <div style={{ display: 'flex', gap: '5px', marginLeft: '20px' }}>
-            <button className="btn-icon" onClick={onPrev} disabled={!onPrev} title="Претходни ученик"><ChevronLeft size={20}/></button>
-            <button className="btn-icon" onClick={onNext} disabled={!onNext} title="Следећи ученик"><ChevronRight size={20}/></button>
-          </div>
+        </div>
+        <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '10px' }}>
+          <button className="btn-small" onClick={onPrev} disabled={!onPrev} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <ChevronLeft size={16}/> Претходни
+          </button>
+          <button className="btn-small" onClick={onNext} disabled={!onNext} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            Следећи <ChevronRight size={16}/>
+          </button>
         </div>
         <div className="rv-t-actions">
           <span className="zoom-info no-print">{Math.round(previewScale * 100)}%</span>
