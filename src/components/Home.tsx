@@ -102,6 +102,22 @@ export const Home: React.FC<HomeProps> = ({ onStartTool }) => {
       </section>
 
       <section className="home-section">
+        <motion.h2 variants={itemVariants} className="section-title">Dodatni Resursi</motion.h2>
+        <motion.div variants={itemVariants} className="resources-grid">
+          <div className="resource-card glass">
+            <div className="resource-info">
+              <h4>Kalibracija Formulara</h4>
+              <p>Preuzmite preporučeni fajl sa koordinatama za standardne A3 matične knjige.</p>
+            </div>
+            <a href="/maticna_kalibracija.json" download className="btn-download-resource">
+              <Download size={20} />
+              Preuzmi JSON
+            </a>
+          </div>
+        </motion.div>
+      </section>
+
+      <section className="home-section">
         <motion.h2 variants={itemVariants} className="section-title">Uputstvo za korišćenje</motion.h2>
         <motion.div variants={itemVariants} className="instructions-container glass">
           <div className="instruction-step">

@@ -288,6 +288,21 @@ export const PrintCalibration: React.FC<Props> = ({ onBack, mockStudent }) => {
     toast('Podešavanja su izvežena u fajl');
   };
 
+  const handleLoadRecommended = async () => {
+    if (confirm('Да ли желите да учитате препоручену калибрацију са сервера? Ово ће преписати ваша тренутна подешавања.')) {
+      try {
+        const response = await fetch('/maticna_kalibracija.json');
+        if (!response.ok) throw new Error('Fajl nije pronađen');
+        const recommended = await response.json();
+        setSettings(recommended);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(recommended));
+        toast('Препоручена калибрација је успешно учитана!');
+      } catch (err) {
+        alert('Грешка при учитавању препоручене калибрације.');
+      }
+    }
+  };
+
   const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -328,6 +343,9 @@ export const PrintCalibration: React.FC<Props> = ({ onBack, mockStudent }) => {
         <div className="cal-t-actions">
           {toastMsg && <div className="cal-toast">{toastMsg}</div>}
           <input type="file" id="import-cal" style={{ display: 'none' }} accept=".json" onChange={handleImport} />
+          <button className="btn-secondary" onClick={handleLoadRecommended}>
+            Učitaj preporučenu
+          </button>
           <button className="btn-secondary" onClick={() => document.getElementById('import-cal')?.click()}>
             Uvezi backup
           </button>
