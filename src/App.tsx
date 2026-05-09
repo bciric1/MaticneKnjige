@@ -7,6 +7,7 @@ import { StudentForm } from './components/StudentForm';
 import { RegistryView } from './components/RegistryView';
 import { PrintCalibration } from './components/PrintCalibration';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Home } from './components/Home';
 import { ImportModal } from './components/ImportModal';
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
       return MOCK_STUDENTS;
     }
   });
-  const [view, setView] = useState<'list' | 'add' | 'edit' | 'print' | 'calibration'>('list');
+  const [view, setView] = useState<'home' | 'list' | 'add' | 'edit' | 'print' | 'calibration'>('home');
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
@@ -111,6 +112,7 @@ function App() {
   return (
     <div className="app-container">
       <Navbar
+        onLanding={() => setView('home')}
         onHome={() => { setView('list'); setSelectedStudent(null); }}
         onAdd={() => { setSelectedStudent(null); setView('add'); }}
         onCalibration={() => setView('calibration')}
@@ -120,6 +122,11 @@ function App() {
       />
       <main className="app-main">
         <AnimatePresence mode="wait">
+          {view === 'home' && (
+            <motion.div key="home" variants={fadeVariants} initial="hidden" animate="visible" exit="exit">
+              <Home onStartTool={() => setView('list')} />
+            </motion.div>
+          )}
           {view === 'list' && (
             <motion.div key="list" variants={fadeVariants} initial="hidden" animate="visible" exit="exit">
               <StudentList

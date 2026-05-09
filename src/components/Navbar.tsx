@@ -1,6 +1,7 @@
 import { Book, PlusCircle, LayoutDashboard, Settings2, Upload, Download, FileJson } from 'lucide-react';
 
 interface NavbarProps {
+  onLanding: () => void;
   onHome: () => void;
   onAdd: () => void;
   onCalibration: () => void;
@@ -9,10 +10,10 @@ interface NavbarProps {
   onImportJson?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onHome, onAdd, onCalibration, onImport, onExportJson, onImportJson }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onLanding, onHome, onAdd, onCalibration, onImport, onExportJson, onImportJson }) => {
   return (
     <nav className="app-navbar no-print">
-      <div className="navbar-brand" onClick={onHome}>
+      <div className="navbar-brand" onClick={onLanding}>
         <div className="brand-icon"><Book size={22} /></div>
         <div>
           <span className="brand-title">Матична Књига</span>
@@ -22,7 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onHome, onAdd, onCalibration, on
       <div className="navbar-actions">
         <button onClick={onHome} className="nav-btn ghost">
           <LayoutDashboard size={17} />
-          Почетна
+          Списак ученика
         </button>
         <button onClick={onCalibration} className="nav-btn ghost">
           <Settings2 size={17} />

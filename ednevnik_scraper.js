@@ -106,7 +106,7 @@
                 const startYearFull = parseInt(userSkolskaGodina.split(/[\/\-]/)[0]) || new Date().getFullYear();
                 const enrollmentYearFull = startYearFull - (numYear - 1);
                 const enrollmentYearShort = String(enrollmentYearFull).substring(2);
-                return `${padRedniBroj}${numYear}${padOdeljenje}${enrollmentYearShort}`;
+                return `${padRedniBroj}1${padOdeljenje}${enrollmentYearShort}`;
             })(),
             prezime: punoIme.split(' ')[0],
             ime: punoIme.split(' ').slice(1).join(' '),
