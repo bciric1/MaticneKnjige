@@ -62,7 +62,7 @@ function getRazred(student: Student, yr: number) {
 function getGrade(student: Student, yr: number, subj: string) {
   const r = getRazred(student, yr);
   if (!r || !r.predmeti) return '';
-  return r.predmeti.find((p: any) => p.naziv === subj)?.ocena ?? '';
+  return r.predmeti.find((p: any) => String(p.naziv || '').replace(/\s+/g, ' ').trim() === subj)?.ocena ?? '';
 }
 
 const getAllSubjects = (student: Student) => {
