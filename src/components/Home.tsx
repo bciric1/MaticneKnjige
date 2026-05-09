@@ -29,10 +29,10 @@ export const Home: React.FC<HomeProps> = ({ onStartTool }) => {
       animate="visible"
     >
       <header className="home-hero">
-        <motion.h1 variants={itemVariants} className="hero-title">
+        <motion.h1 variants={itemVariants} className="home-hero-title">
           Dobrodošli u <span className="text-gradient">TSP Digitalne Alate</span>
         </motion.h1>
-        <motion.p variants={itemVariants} className="hero-subtitle">
+        <motion.p variants={itemVariants} className="home-hero-subtitle">
           Moderni sistem za automatizaciju administrativnih poslova u srednjoj tehničkoj školi.
         </motion.p>
       </header>

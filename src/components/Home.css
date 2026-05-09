@@ -9,7 +9,7 @@
   margin-bottom: 5rem;
 }
 
-.hero-title {
+.home-hero-title {
   font-size: 3.5rem;
   font-weight: 800;
   color: var(--primary);
@@ -23,7 +23,7 @@
   -webkit-text-fill-color: transparent;
 }
 
-.hero-subtitle {
+.home-hero-subtitle {
   font-size: 1.25rem;
   color: var(--text-light);
   max-width: 600px;
