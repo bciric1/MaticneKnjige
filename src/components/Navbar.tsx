@@ -16,8 +16,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onLanding, onHome, onAdd, onCali
       <div className="navbar-brand" onClick={onLanding}>
         <div className="brand-icon"><Book size={22} /></div>
         <div>
-          <span className="brand-title">Матична Књига</span>
-          <span className="brand-sub">Ученика</span>
+          <span className="brand-title">Алати за наставнике</span>
         </div>
       </div>
       <div className="navbar-actions">

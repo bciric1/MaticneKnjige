@@ -302,13 +302,13 @@ input:focus, select:focus, textarea:focus {
   font-size: 1.6rem;
   font-weight: 800;
   margin-bottom: 0.2rem;
-  color: white;
+  color: white !important;
 }
 
 .hero-subtitle {
   font-size: 0.9rem;
   opacity: 0.9;
-  color: white;
+  color: white !important;
 }
 
 .clear-all-btn {
