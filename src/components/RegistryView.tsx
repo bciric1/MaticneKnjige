@@ -1,10 +1,10 @@
 import React, { useRef, useState } from 'react';
 import type { Student, PrintCalibrationSettings } from '../types';
 import { useReactToPrint } from 'react-to-print';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import './RegistryView.css';
 
-interface Props { student: Student; onBack: () => void; }
+interface Props { student: Student; onBack: () => void; onNext?: () => void; onPrev?: () => void; }
 
 const STORAGE_KEY = 'maticna_print_calibration';
 
@@ -99,7 +99,7 @@ const CalibField = ({ id, val, className = "", calib }: { id: string, val: any, 
   );
 };
 
-export const RegistryView: React.FC<Props> = ({ student, onBack }) => {
+export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev }) => {
   const ref = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({ contentRef: ref });
   const [currentPage, setCurrentPage] = useState(1);
@@ -211,6 +211,10 @@ export const RegistryView: React.FC<Props> = ({ student, onBack }) => {
         <div className="rv-t-left">
           <button className="btn-icon" onClick={onBack} title="Назад"><ArrowLeft size={20}/></button>
           <h1>{student.prezime} {student.ime} (Страна {currentPage})</h1>
+          <div style={{ display: 'flex', gap: '5px', marginLeft: '20px' }}>
+            <button className="btn-icon" onClick={onPrev} disabled={!onPrev} title="Претходни ученик"><ChevronLeft size={20}/></button>
+            <button className="btn-icon" onClick={onNext} disabled={!onNext} title="Следећи ученик"><ChevronRight size={20}/></button>
+          </div>
         </div>
         <div className="rv-t-actions">
           <span className="zoom-info no-print">{Math.round(previewScale * 100)}%</span>

@@ -145,6 +145,8 @@ function App() {
               <RegistryView
                 student={selectedStudent}
                 onBack={() => { setView('list'); setSelectedStudent(null); }}
+                onNext={students.indexOf(selectedStudent) < students.length - 1 ? () => setSelectedStudent(students[students.indexOf(selectedStudent) + 1]) : undefined}
+                onPrev={students.indexOf(selectedStudent) > 0 ? () => setSelectedStudent(students[students.indexOf(selectedStudent) - 1]) : undefined}
               />
             </motion.div>
           )}
