@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Printer, ChevronRight, HelpCircle, Download, MousePointer2 } from 'lucide-react';
 import './Home.css';
@@ -12,6 +12,13 @@ interface HomeProps {
 
 export const Home: React.FC<HomeProps> = ({ onStartTool }) => {
   const bookmarklet = `javascript:${encodeURIComponent(SCRAPER_CODE)}`;
+  const linkRef = useRef<HTMLAnchorElement>(null);
+
+  useLayoutEffect(() => {
+    if (linkRef.current) {
+      linkRef.current.setAttribute('href', bookmarklet);
+    }
+  }, [bookmarklet]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -50,7 +57,10 @@ export const Home: React.FC<HomeProps> = ({ onStartTool }) => {
             Samo prevucite dugme ispod u vašu traku sa obeleživačima (Bookmarks bar) i kliknite na njega dok ste na eDnevniku.
           </p>
           
-          <a href={bookmarklet} className="bookmarklet-btn" onClick={(e) => e.preventDefault()}>
+          <a ref={linkRef} className="bookmarklet-btn" onClick={(e) => {
+            // Prevent click navigation, but allow dragging
+            if (e.currentTarget.getAttribute('href') === '#') e.preventDefault();
+          }}>
             <MousePointer2 size={24} />
             Prevucite me u Bookmarks bar
           </a>
