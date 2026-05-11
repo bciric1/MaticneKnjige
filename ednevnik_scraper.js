@@ -232,12 +232,14 @@
                     const ocenaNum = ocenaRaw?.match(/\((\d+)\)/)?.[1] || ocenaRaw;
                     
                     if (naziv === "Владање") {
-                        student.razredi[numYear].vladanje = ocenaRaw;
+                        student.razredi[numYear].vladanje = ocenaRaw || "";
                     } else if (naziv === "Општи успех") {
-                        student.razredi[numYear].opstiUspeh = ocenaRaw.split('(')[0].trim();
-                        student.razredi[numYear].prosecnaOcena = ocenaRaw.match(/\(([^)]+)\)/)?.[1] || "";
-                    } else if (naziv && naziv !== "Предмет" && ocenaRaw && ocenaRaw !== "/") {
-                        student.razredi[numYear].predmeti.push({ naziv, ocena: ocenaNum });
+                        student.razredi[numYear].opstiUspeh = ocenaRaw ? ocenaRaw.split('(')[0].trim() : "";
+                        student.razredi[numYear].prosecnaOcena = ocenaRaw ? (ocenaRaw.match(/\(([^)]+)\)/)?.[1] || "") : "";
+                    } else if (naziv && naziv !== "Предмет") {
+                        // Učitaj predmet čak i ako nema ocene (ocena će biti prazan string ili "/" ako ne postoji)
+                        const finalOcena = (ocenaRaw && ocenaRaw !== "/") ? ocenaNum : "";
+                        student.razredi[numYear].predmeti.push({ naziv, ocena: finalOcena });
                     }
                 }
             });
