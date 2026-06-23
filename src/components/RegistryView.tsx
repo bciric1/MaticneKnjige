@@ -541,8 +541,8 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
                    <tbody>
                       {subjects.map((subj, i) => (
                         <tr key={i}>
-                          <td style={{ border: '1px solid black', padding: '5px' }}>{subj}</td>
-                          {years.map(y => <td key={y} style={{ border: '1px solid black', padding: '5px', textAlign: 'center' }}>{getGrade(student, y, subj)}</td>)}
+                          <td style={{ border: '1px solid black', padding: '5px' }}>{subj.name}</td>
+                          {years.map(y => <td key={y} style={{ border: '1px solid black', padding: '5px', textAlign: 'center' }}>{getGrade(student, y, subj.name)}</td>)}
                         </tr>
                       ))}
                    </tbody>
