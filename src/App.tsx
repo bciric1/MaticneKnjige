@@ -9,6 +9,7 @@ import { PrintCalibration } from './components/PrintCalibration';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Home } from './components/Home';
 import { ImportModal } from './components/ImportModal';
+import { GradesCalculator } from './components/GradesCalculator';
 
 function App() {
   const [students, setStudents] = useState<Student[]>(() => {
@@ -19,7 +20,7 @@ function App() {
       return MOCK_STUDENTS;
     }
   });
-  const [view, setView] = useState<'home' | 'list' | 'add' | 'edit' | 'print' | 'calibration'>('home');
+  const [view, setView] = useState<'home' | 'list' | 'add' | 'edit' | 'print' | 'calibration' | 'grades'>('home');
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
@@ -119,12 +120,18 @@ function App() {
         onImport={() => setIsImportModalOpen(true)}
         onExportJson={handleExportJson}
         onImportJson={handleImportJson}
+        onGrades={() => setView('grades')}
       />
       <main className="app-main">
         <AnimatePresence mode="wait">
           {view === 'home' && (
             <motion.div key="home" variants={fadeVariants} initial="hidden" animate="visible" exit="exit">
-              <Home onStartTool={() => setView('list')} />
+              <Home onStartTool={() => setView('list')} onStartGrades={() => setView('grades')} />
+            </motion.div>
+          )}
+          {view === 'grades' && (
+            <motion.div key="grades" variants={fadeVariants} initial="hidden" animate="visible" exit="exit">
+              <GradesCalculator onBack={() => setView('home')} />
             </motion.div>
           )}
           {view === 'list' && (

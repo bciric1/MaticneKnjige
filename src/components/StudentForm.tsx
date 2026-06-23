@@ -72,7 +72,41 @@ const emptyStudent = (): Student => ({
 });
 
 export const StudentForm: React.FC<StudentFormProps> = ({ student, onSubmit, onCancel }) => {
-  const [form, setForm] = useState<Student>(student ? JSON.parse(JSON.stringify(student)) : emptyStudent());
+  const getInitialForm = (): Student => {
+    if (!student) return emptyStudent();
+    const def = emptyStudent();
+    return {
+      ...def,
+      ...student,
+      matura: {
+        ...def.matura,
+        ...(student.matura || {}),
+        maturskiRad: {
+          ...def.matura.maturskiRad,
+          ...(student.matura?.maturskiRad || {})
+        },
+        predmetiZnanje: student.matura?.predmetiZnanje || def.matura.predmetiZnanje
+      },
+      razredi: (() => {
+        const merged: Record<number, RazredniPodaci> = {};
+        if (student.razredi && Object.keys(student.razredi).length > 0) {
+          Object.entries(student.razredi).forEach(([key, val]) => {
+            const k = parseInt(key);
+            merged[k] = {
+              ...emptyRazred(val.razred || '', val.skolskaGodina || ''),
+              ...val,
+              predmeti: val.predmeti || []
+            };
+          });
+        } else {
+          merged[1] = emptyRazred('I', '');
+        }
+        return merged;
+      })()
+    };
+  };
+
+  const [form, setForm] = useState<Student>(JSON.parse(JSON.stringify(getInitialForm())));
   const [openRazred, setOpenRazred] = useState<number>(1);
 
   const set = (field: keyof Student, val: any) => setForm(prev => ({ ...prev, [field]: val }));
@@ -150,8 +184,8 @@ export const StudentForm: React.FC<StudentFormProps> = ({ student, onSubmit, onC
       <div className="form-section">
         <div className="form-section-title"><User size={18} /> Лични подаци ученика</div>
         <div className="form-grid-3">
-          <label>Презиме<input value={form.prezime} onChange={e => set('prezime', e.target.value)} required /></label>
-          <label>Име<input value={form.ime} onChange={e => set('ime', e.target.value)} required /></label>
+          <label>Презиме<input value={form.prezime} onChange={e => set('prezime', e.target.value)} /></label>
+          <label>Име<input value={form.ime} onChange={e => set('ime', e.target.value)} /></label>
           <label>Отац / мајка / старатељ
             <select value={form.imeRoditeljaOca} onChange={e => set('imeRoditeljaOca', e.target.value)}>
               <option value="otac">отац</option>
@@ -160,8 +194,8 @@ export const StudentForm: React.FC<StudentFormProps> = ({ student, onSubmit, onC
             </select>
           </label>
           <label>Пуно ime родитеља/старатеља<input value={form.imeRoditeljaStaratelja} onChange={e => set('imeRoditeljaStaratelja', e.target.value)} /></label>
-          <label>Датум рођења<input type="date" value={form.datumRodjenja} onChange={e => set('datumRodjenja', e.target.value)} required /></label>
-          <label>Место рођења<input value={form.mestoRodjenja} onChange={e => set('mestoRodjenja', e.target.value)} required /></label>
+          <label>Датум рођења<input type="date" value={form.datumRodjenja} onChange={e => set('datumRodjenja', e.target.value)} /></label>
+          <label>Место рођења<input value={form.mestoRodjenja} onChange={e => set('mestoRodjenja', e.target.value)} /></label>
           <label>Општина/Област<input value={form.opstinaRodjenja} onChange={e => set('opstinaRodjenja', e.target.value)} /></label>
           <label>Држава рођења<input value={form.drzavaRodjenja} onChange={e => set('drzavaRodjenja', e.target.value)} /></label>
         </div>

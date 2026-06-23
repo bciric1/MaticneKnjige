@@ -211,24 +211,53 @@
             const gradesHtml = await gradesRes.text();
             const gradeDoc = new DOMParser().parseFromString(gradesHtml, 'text/html');
             const gradeRows = Array.from(gradeDoc.querySelectorAll('.table-report tbody tr'));
+            
+            // Dinamička detekcija kolona po hederima
+            const gradeHeaders = Array.from(gradeDoc.querySelectorAll('.table-report th')).map(th => th.innerText.trim().toLowerCase());
+            const idxAvgust = gradeHeaders.findIndex(h => h.includes('31.') || h.includes('avgust') || h.includes('август'));
+            const idxZakljucna = gradeHeaders.findIndex(h => h.includes('закључ') || h.includes('zakljuc') || h.includes('конач') || h.includes('konac'));
+            const idxDrugo = gradeHeaders.findIndex(h => h.includes('drugo') || h.includes('друго'));
+            const idxPrvo = gradeHeaders.findIndex(h => h.includes('prvo') || h.includes('прво'));
+            console.log(`[Scraper] Student ID: ${studentId}, Hederi:`, gradeHeaders, `Indeksi -> Avgust: ${idxAvgust}, Zakljucna: ${idxZakljucna}, Drugo: ${idxDrugo}, Prvo: ${idxPrvo}`);
+
             gradeRows.forEach(grRow => {
                 const cells = Array.from(grRow.querySelectorAll('td'));
                 
-                // eDnevnik obično ima: Naziv (0), I polugodje (1), II polugodje (2), Zaključna (3)
-                // Korisnik želi ocene iz kolone "drugo polugodje" -> index 2
-                const gradeIdx = cells.length >= 3 ? 2 : 1;
-
                 if (cells.length >= 2) {
                     let naziv = cells[0].innerText.trim().replace(/\s+/g, ' ');
                     
-                    // Ukloni tekst "(обавезан изборни predmet)"
+                    // Ukloni tekst "(обавезан izborni predmet)"
                     naziv = naziv.replace(/\s*\(обавезан изборни predmet\)/gi, '')
                                  .replace(/\s*\(обавезан изборни\)/gi, '')
                                  .replace(/\s*\(обавезни изборни програм\)/gi, '')
                                  .replace(/\s*\(обавезни изборни\)/gi, '')
                                  .trim();
                     
-                    const ocenaRaw = cells[gradeIdx]?.innerText.trim();
+                    // Funkcija za bezbedno čitanje ocene
+                    const getGradeFromIndex = (idx) => {
+                        if (idx !== -1 && cells[idx]) {
+                            const val = cells[idx].innerText.trim();
+                            if (val && val !== "/" && val !== "-") {
+                                return val;
+                            }
+                        }
+                        return null;
+                    };
+
+                    // Prioritet: 31. avgust -> Zaključna -> Drugo polugodje -> Prvo polugodje
+                    let ocenaRaw = getGradeFromIndex(idxAvgust);
+                    if (!ocenaRaw) ocenaRaw = getGradeFromIndex(idxZakljucna);
+                    if (!ocenaRaw) ocenaRaw = getGradeFromIndex(idxDrugo);
+                    if (!ocenaRaw) ocenaRaw = getGradeFromIndex(idxPrvo);
+
+                    // Krajnji fallback ako ništa nije pronađeno
+                    if (!ocenaRaw) {
+                        let fallbackIdx = 2;
+                        if (cells.length >= 5) fallbackIdx = 4;
+                        else if (cells.length >= 4) fallbackIdx = 3;
+                        ocenaRaw = cells[fallbackIdx]?.innerText.trim() || "";
+                    }
+
                     const ocenaNum = ocenaRaw?.match(/\((\d+)\)/)?.[1] || ocenaRaw;
                     
                     if (naziv === "Владање") {

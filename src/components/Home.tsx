@@ -1,6 +1,6 @@
 import React, { useRef, useLayoutEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Printer, ChevronRight, HelpCircle, Download, MousePointer2 } from 'lucide-react';
+import { BookOpen, Printer, ChevronRight, HelpCircle, Download, MousePointer2, Award } from 'lucide-react';
 import './Home.css';
 
 // @ts-ignore
@@ -8,9 +8,10 @@ import SCRAPER_CODE from '../../ednevnik_scraper.js?raw';
 
 interface HomeProps {
   onStartTool: () => void;
+  onStartGrades: () => void;
 }
 
-export const Home: React.FC<HomeProps> = ({ onStartTool }) => {
+export const Home: React.FC<HomeProps> = ({ onStartTool, onStartGrades }) => {
   const bookmarklet = `javascript:${encodeURIComponent(SCRAPER_CODE)}`;
   const linkRef = useRef<HTMLAnchorElement>(null);
 
@@ -82,6 +83,20 @@ export const Home: React.FC<HomeProps> = ({ onStartTool }) => {
             <div className="tool-content">
               <h3>Matične Knjige</h3>
               <p>Automatizovana štampa i vođenje evidencije matičnih knjiga učenika optimizovano za A3 formulare.</p>
+              <div className="tool-footer">
+                <span>Pokreni alat</span>
+                <ChevronRight size={18} />
+              </div>
+            </div>
+          </div>
+
+          <div className="tool-card glass animate-hover" onClick={onStartGrades}>
+            <div className="tool-icon-wrapper">
+              <Award size={32} className="tool-icon" />
+            </div>
+            <div className="tool-content">
+              <h3>Procena uspeha učenika</h3>
+              <p>Analiza ocena i automatski proračun srednje ocene i opšteg uspeha odeljenja direktno sa eDnevnika.</p>
               <div className="tool-footer">
                 <span>Pokreni alat</span>
                 <ChevronRight size={18} />

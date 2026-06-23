@@ -28,6 +28,25 @@ const DEFAULT_CALIB: PrintCalibrationSettings = {
   'skolska_godina_2': { x: 180, y: 140 },
   'enr_class_roman': { x: 100, y: 130 },
   'pers_country': { x: 255, y: 78 },
+  // Godine i razredi na vrhu strana 1
+  'hdr_y1_god1': { x: 140, y: 140 },
+  'hdr_y1_god2': { x: 145, y: 140 },
+  'hdr_y1_razred': { x: 140, y: 145 },
+  'hdr_y2_god1': { x: 165, y: 140 },
+  'hdr_y2_god2': { x: 170, y: 140 },
+  'hdr_y2_razred': { x: 165, y: 145 },
+  'hdr_y3_god1': { x: 190, y: 140 },
+  'hdr_y3_god2': { x: 195, y: 140 },
+  'hdr_y3_razred': { x: 190, y: 145 },
+  'hdr_y4_god1': { x: 215, y: 140 },
+  'hdr_y4_god2': { x: 220, y: 140 },
+  'hdr_y4_razred': { x: 215, y: 145 },
+  // Ocene i predmeti strana 1
+  'grades_subjects': { x: 20, y: 150 },
+  'grades_y1': { x: 140, y: 150 },
+  'grades_y2': { x: 165, y: 150 },
+  'grades_y3': { x: 190, y: 150 },
+  'grades_y4': { x: 215, y: 150 },
   // Strana 2 defaulti
   'back_class_roman': { x: 140, y: 80 },
   'back_skolska_godina_1': { x: 140, y: 85 },
@@ -74,7 +93,7 @@ const getAllSubjects = (student: Student) => {
       if (name && !subjectMap.has(name)) subjectMap.set(name, y);
     });
   });
-  return Array.from(subjectMap.keys());
+  return Array.from(subjectMap.entries()).map(([name, year]) => ({ name, year }));
 };
 
 function cleanStr(s: any): string {
@@ -133,6 +152,14 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
     return new Set();
   });
 
+  const [hiddenSubjectYears, setHiddenSubjectYears] = useState<Set<number>>(() => {
+    try {
+      const saved = localStorage.getItem('maticna_hidden_subj_years');
+      if (saved) return new Set(JSON.parse(saved));
+    } catch(e) {}
+    return new Set();
+  });
+
   const toggleField = (id: string) => {
     setHiddenFields(prev => {
       const next = new Set(prev);
@@ -149,6 +176,15 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
       if (next.has(key)) next.delete(key);
       else next.add(key);
       localStorage.setItem('maticna_hidden_items', JSON.stringify(Array.from(next)));
+      return next;
+    });
+  };
+
+  const toggleSubjectYear = (y: number) => {
+    setHiddenSubjectYears(prev => {
+      const next = new Set(prev);
+      if (next.has(y)) next.delete(y); else next.add(y);
+      localStorage.setItem('maticna_hidden_subj_years', JSON.stringify(Array.from(next)));
       return next;
     });
   };
@@ -255,6 +291,17 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
               </label>
             ))}
           </div>
+          {currentPage === 1 && (
+            <div className="field-toggle-list" style={{ marginTop: '15px' }}>
+              <h4 style={{ margin: '5px 0', fontSize: '0.8rem', color: '#64748b', textTransform: 'uppercase' }}>Штампа назива предмета</h4>
+              {[1, 2, 3, 4].map(y => (
+                <label key={`subj-year-${y}`} className="toggle-item">
+                  <input type="checkbox" checked={!hiddenSubjectYears.has(y)} onChange={() => toggleSubjectYear(y)} />
+                  <span>Предмети из {y}. године</span>
+                </label>
+              ))}
+            </div>
+          )}
         </div>
 
         <div ref={ref} className={`rv-print-area ${useOverlay ? 'overlay-mode' : ''}`}>
@@ -290,8 +337,13 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
                     {!hiddenFields.has('enr_jisp') && <CalibField calib={calib} id="enr_jisp" val={cleanStr(student.jispProgram)} />}
                     {!hiddenFields.has('enr_duration') && <CalibField calib={calib} id="enr_duration" val={student.trajanjeObrazovanjaGodina} />}
                     {!hiddenFields.has('status_redovan') && <CalibField calib={calib} id="status_redovan" val={(student.jmbg && student.jmbg.length === 13 && parseInt(student.jmbg.charAt(9)) >= 5) ? 'редовна' : 'редован'} />}
+                    {!hiddenFields.has('skolska_godina_1') && <CalibField calib={calib} id="skolska_godina_1" val={(getRazred(student, 1)?.skolskaGodina || '').split(/[\/\-]/)[0]} />}
+                    {!hiddenFields.has('skolska_godina_2') && <CalibField calib={calib} id="skolska_godina_2" val={(getRazred(student, 1)?.skolskaGodina || '').split(/[\/\-]/)[1] || ''} />}
+                    {!hiddenFields.has('enr_class_roman') && <CalibField calib={calib} id="enr_class_roman" val={getRazred(student, 1)?.razred || ''} />}
                     {years.map(y => {
                       const r = getRazred(student, y);
+                      const hideColumn = hiddenFields.has(`grades_y${y}`);
+                      if (hideColumn) return null;
                       return (
                         <React.Fragment key={`hdr_y${y}`}>
                           {!hiddenFields.has(`hdr_y${y}_razred`) && <CalibField calib={calib} id={`hdr_y${y}_razred`} val={r?.razred || ''} />}
@@ -305,17 +357,18 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
                       <div className="calib-field-print no-border" style={{ left: `${calib['grades_subjects']?.x ?? 20}mm`, top: `${calib['grades_subjects']?.y ?? 150}mm`, position: 'absolute', pointerEvents: 'auto' }}>
                         <table className="no-border">
                           <tbody>
-                            {subjects.map((subj, i) => {
-                              const isHidden = hiddenItems.has(`subj_${i}`);
+                            {subjects.map((subjObj, i) => {
+                              const isHiddenItem = hiddenItems.has(`subj_${i}`);
+                              const isHiddenYear = hiddenSubjectYears.has(subjObj.year);
                               return (
                                 <tr key={i} style={{ height: `${calib.gradesRowHeight || 6.5}mm` }}>
                                   <td 
-                                    className={`td-subj ${isHidden ? 'hide-on-print' : ''}`} 
-                                    style={{ cursor: 'pointer' }}
+                                    className={`td-subj ${isHiddenItem ? 'hide-on-print' : ''}`} 
+                                    style={{ cursor: 'pointer', visibility: isHiddenYear ? 'hidden' : 'visible' }}
                                     onClick={() => toggleItem(`subj_${i}`)}
                                     title="Kliknite da sakrijete/prikažete ovaj predmet"
                                   >
-                                    {subj}
+                                    {subjObj.name}
                                   </td>
                                 </tr>
                               );
@@ -328,8 +381,8 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
                       <div key={y} className="cal-field" style={{ left: `${calib[`grades_y${y}`]?.x ?? (140 + (y-1)*25)}mm`, top: `${calib[`grades_y${y}`]?.y ?? 150}mm`, position: 'absolute' }}>
                         <table className="no-border" style={{ width: `${calib.gradesColWidth || 15}mm` }}>
                           <tbody>
-                            {subjects.map((subj, i) => {
-                              const rawGrade = getGrade(student, y, subj);
+                            {subjects.map((subjObj, i) => {
+                              const rawGrade = getGrade(student, y, subjObj.name);
                               let formattedGrade = rawGrade;
                               if (rawGrade === '5') formattedGrade = 'одличан (5)';
                               else if (rawGrade === '4') formattedGrade = 'врло добар (4)';

@@ -1,4 +1,4 @@
-import { Book, PlusCircle, LayoutDashboard, Settings2, Upload, Download, FileJson } from 'lucide-react';
+import { Book, PlusCircle, LayoutDashboard, Settings2, Upload, Download, FileJson, TrendingUp } from 'lucide-react';
 
 interface NavbarProps {
   onLanding: () => void;
@@ -8,9 +8,12 @@ interface NavbarProps {
   onImport: () => void;
   onExportJson?: () => void;
   onImportJson?: () => void;
+  onGrades: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onLanding, onHome, onAdd, onCalibration, onImport, onExportJson, onImportJson }) => {
+export const Navbar: React.FC<NavbarProps> = ({ 
+  onLanding, onHome, onAdd, onCalibration, onImport, onExportJson, onImportJson, onGrades 
+}) => {
   return (
     <nav className="app-navbar no-print">
       <div className="navbar-brand" onClick={onLanding}>
@@ -23,6 +26,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onLanding, onHome, onAdd, onCali
         <button onClick={onHome} className="nav-btn ghost">
           <LayoutDashboard size={17} />
           Списак ученика
+        </button>
+        <button onClick={onGrades} className="nav-btn ghost">
+          <TrendingUp size={17} />
+          Процена Успеха
         </button>
         <button onClick={onCalibration} className="nav-btn ghost">
           <Settings2 size={17} />
@@ -52,3 +59,4 @@ export const Navbar: React.FC<NavbarProps> = ({ onLanding, onHome, onAdd, onCali
     </nav>
   );
 };
+
