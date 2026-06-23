@@ -213,12 +213,19 @@
             const gradeRows = Array.from(gradeDoc.querySelectorAll('.table-report tbody tr'));
             
             // Dinamička detekcija kolona po hederima
-            const gradeHeaders = Array.from(gradeDoc.querySelectorAll('.table-report th')).map(th => th.innerText.trim().toLowerCase());
-            const idxAvgust = gradeHeaders.findIndex(h => h.includes('31.') || h.includes('avgust') || h.includes('август'));
-            const idxZakljucna = gradeHeaders.findIndex(h => h.includes('закључ') || h.includes('zakljuc') || h.includes('конач') || h.includes('konac'));
-            const idxDrugo = gradeHeaders.findIndex(h => h.includes('drugo') || h.includes('друго'));
-            const idxPrvo = gradeHeaders.findIndex(h => h.includes('prvo') || h.includes('прво'));
-            console.log(`[Scraper] Student ID: ${studentId}, Hederi:`, gradeHeaders, `Indeksi -> Avgust: ${idxAvgust}, Zakljucna: ${idxZakljucna}, Drugo: ${idxDrugo}, Prvo: ${idxPrvo}`);
+            // Filtriramo heder ćelije koje imaju colspan > 1 (npr. super-heder "Zaključne ocene") jer one prave pomeraj (offset) u indeksima.
+            const allThs = Array.from(gradeDoc.querySelectorAll('.table-report th'));
+            const leafThs = allThs.filter(th => {
+                const colspan = parseInt(th.getAttribute('colspan') || '1', 10);
+                return colspan <= 1;
+            });
+            const gradeHeaders = leafThs.map(th => th.innerText.trim().toLowerCase());
+            
+            const idxAvgust = gradeHeaders.findIndex(h => h.includes('31.') || h.includes('avgust') || h.includes('август') || h.includes('popravn') || h.includes('поправн'));
+            const idxDrugo = gradeHeaders.findIndex(h => h.includes('drugo') || h.includes('друго') || h.includes('2.'));
+            const idxPrvo = gradeHeaders.findIndex(h => h.includes('prvo') || h.includes('прво') || h.includes('1.'));
+            
+            console.log(`[Scraper] Student ID: ${studentId}, Detektovani (leaf) hederi:`, gradeHeaders, `Indeksi -> Avgust: ${idxAvgust}, Drugo: ${idxDrugo}, Prvo: ${idxPrvo}`);
 
             gradeRows.forEach(grRow => {
                 const cells = Array.from(grRow.querySelectorAll('td'));
@@ -244,19 +251,11 @@
                         return null;
                     };
 
-                    // Prioritet: 31. avgust -> Zaključna -> Drugo polugodje -> Prvo polugodje
+                    // Prioritet: 31. avgust -> Drugo polugodje
                     let ocenaRaw = getGradeFromIndex(idxAvgust);
-                    if (!ocenaRaw) ocenaRaw = getGradeFromIndex(idxZakljucna);
                     if (!ocenaRaw) ocenaRaw = getGradeFromIndex(idxDrugo);
-                    if (!ocenaRaw) ocenaRaw = getGradeFromIndex(idxPrvo);
-
-                    // Krajnji fallback ako ništa nije pronađeno
-                    if (!ocenaRaw) {
-                        let fallbackIdx = 2;
-                        if (cells.length >= 5) fallbackIdx = 4;
-                        else if (cells.length >= 4) fallbackIdx = 3;
-                        ocenaRaw = cells[fallbackIdx]?.innerText.trim() || "";
-                    }
+                    
+                    // Uklonjen fallback na prvo polugodište (kako ne bi prepisivao uspeh sa polugodišta)
 
                     const ocenaNum = ocenaRaw?.match(/\((\d+)\)/)?.[1] || ocenaRaw;
                     
