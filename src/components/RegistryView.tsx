@@ -84,7 +84,7 @@ function getGrade(student: Student, yr: number, subj: string) {
   return r.predmeti.find((p: any) => String(p.naziv || '').replace(/\s+/g, ' ').trim() === subj)?.ocena ?? '';
 }
 
-const getAllSubjects = (student: Student) => {
+const getAllSubjects = (student: Student, addEmptyRows: boolean = false) => {
   const subjectMap = new Map<string, number>();
   [1, 2, 3, 4].forEach(y => {
     const razred = getRazred(student, y);
@@ -93,7 +93,19 @@ const getAllSubjects = (student: Student) => {
       if (name && !subjectMap.has(name)) subjectMap.set(name, y);
     });
   });
-  return Array.from(subjectMap.entries()).map(([name, year]) => ({ name, year }));
+  
+  const result: { name: string, year: number }[] = [];
+  let currentYear = 1;
+  
+  Array.from(subjectMap.entries()).forEach(([name, year]) => {
+    if (addEmptyRows && year > currentYear) {
+      result.push({ name: '', year: -1 });
+      currentYear = year;
+    }
+    result.push({ name, year });
+  });
+  
+  return result;
 };
 
 function cleanStr(s: any): string {
@@ -189,6 +201,7 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
     });
   };
 
+  const [addEmptyRows, setAddEmptyRows] = useState(() => localStorage.getItem('maticna_empty_rows') !== 'false');
   const [previewScale, setPreviewScale] = useState(0.5);
 
   const ALL_FIELDS = [
@@ -238,7 +251,7 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
     { id: 'back_napomena', label: 'Напомена', page: 2 },
   ];
 
-  const subjects = getAllSubjects(student);
+  const subjects = getAllSubjects(student, addEmptyRows);
   const years = [1, 2, 3, 4];
 
   return (
@@ -277,6 +290,20 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
               onChange={(e) => setPreviewScale(parseFloat(e.target.value))} 
               className="zoom-slider"
             />
+          </div>
+          <hr/>
+          <div className="side-section" style={{ marginTop: '10px' }}>
+             <label className="toggle-item" style={{ fontSize: '0.9rem', fontWeight: 'bold' }}>
+               <input 
+                 type="checkbox" 
+                 checked={addEmptyRows} 
+                 onChange={(e) => {
+                   setAddEmptyRows(e.target.checked);
+                   localStorage.setItem('maticna_empty_rows', e.target.checked.toString());
+                 }} 
+               />
+               <span>Празни редови између година</span>
+             </label>
           </div>
           <hr/>
           <h3>Видљивост поља</h3>
@@ -331,11 +358,11 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
                     {!hiddenFields.has('pers_country') && <CalibField calib={calib} id="pers_country" val={cleanStr(student.drzavaRodjenja || 'Srbija')} />}
                     {!hiddenFields.has('pers_parents') && <CalibField calib={calib} id="pers_parents" val={cleanStr(student.imeRoditeljaStaratelja)} />}
                     {!hiddenFields.has('enr_school') && <CalibField calib={calib} id="enr_school" val={cleanStr(student.skolaUpisa)} />}
-                    {!hiddenFields.has('enr_class') && <CalibField calib={calib} id="enr_class" val={cleanStr(student.razredUpisa)} />}
+                    {!hiddenFields.has('enr_class') && <CalibField calib={calib} id="enr_class" val="први" />}
                     {!hiddenFields.has('enr_profile') && <CalibField calib={calib} id="enr_profile" val={cleanStr(student.obrazovniProfilSmer)} />}
                     {!hiddenFields.has('enr_smer') && <CalibField calib={calib} id="enr_smer" val={cleanStr(student.smer)} />}
                     {!hiddenFields.has('enr_jisp') && <CalibField calib={calib} id="enr_jisp" val={cleanStr(student.jispProgram)} />}
-                    {!hiddenFields.has('enr_duration') && <CalibField calib={calib} id="enr_duration" val={student.trajanjeObrazovanjaGodina} />}
+                    {!hiddenFields.has('enr_duration') && <CalibField calib={calib} id="enr_duration" val={{1: 'једна', 2: 'две', 3: 'три', 4: 'четири', 5: 'пет', 6: 'шест'}[student.trajanjeObrazovanjaGodina as number] || student.trajanjeObrazovanjaGodina} />}
                     {!hiddenFields.has('status_redovan') && <CalibField calib={calib} id="status_redovan" val={(student.jmbg && student.jmbg.length === 13 && parseInt(student.jmbg.charAt(9)) >= 5) ? 'редовна' : 'редован'} />}
                     {!hiddenFields.has('skolska_godina_1') && <CalibField calib={calib} id="skolska_godina_1" val={(getRazred(student, 1)?.skolskaGodina || '').split(/[\/\-]/)[0]} />}
                     {!hiddenFields.has('skolska_godina_2') && <CalibField calib={calib} id="skolska_godina_2" val={(getRazred(student, 1)?.skolskaGodina || '').split(/[\/\-]/)[1] || ''} />}

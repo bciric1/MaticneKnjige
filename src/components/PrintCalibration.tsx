@@ -92,11 +92,11 @@ function getMockValue(id: string, student: Student) {
     case 'pers_country': return student.drzavaRodjenja || 'Србија';
     case 'pers_parents': return student.imeRoditeljaStaratelja || 'Име Родитеља';
     case 'enr_school': return student.skolaUpisa || 'Назив школе';
-    case 'enr_class': return student.razredUpisa || 'I-1';
+    case 'enr_class': return 'први';
     case 'enr_profile': return student.obrazovniProfilSmer || 'Електротехничар';
     case 'enr_smer': return student.smer || 'Рачунари';
     case 'enr_jisp': return student.jispProgram || '123456';
-    case 'enr_duration': return student.trajanjeObrazovanjaGodina?.toString() || '4';
+    case 'enr_duration': return {1: 'једна', 2: 'две', 3: 'три', 4: 'четири', 5: 'пет', 6: 'шест'}[student.trajanjeObrazovanjaGodina as number] || student.trajanjeObrazovanjaGodina?.toString() || 'четири';
     case 'status_redovan': 
       return (student.jmbg && student.jmbg.length === 13 && parseInt(student.jmbg.charAt(9)) >= 5) ? 'редовна' : 'редован';
 
