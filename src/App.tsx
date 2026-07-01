@@ -158,6 +158,7 @@ function App() {
             <motion.div key="print" variants={fadeVariants} initial="hidden" animate="visible" exit="exit">
               <RegistryView
                 student={selectedStudent}
+                allStudents={students}
                 onBack={() => { setView('list'); setSelectedStudent(null); }}
                 onNext={students.indexOf(selectedStudent) < students.length - 1 ? () => setSelectedStudent(students[students.indexOf(selectedStudent) + 1]) : undefined}
                 onPrev={students.indexOf(selectedStudent) > 0 ? () => setSelectedStudent(students[students.indexOf(selectedStudent) - 1]) : undefined}

@@ -4,7 +4,7 @@ import { useReactToPrint } from 'react-to-print';
 import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import './RegistryView.css';
 
-interface Props { student: Student; onBack: () => void; onNext?: () => void; onPrev?: () => void; }
+interface Props { student: Student; allStudents?: Student[]; onBack: () => void; onNext?: () => void; onPrev?: () => void; }
 
 const STORAGE_KEY = 'maticna_print_calibration';
 
@@ -130,11 +130,12 @@ const CalibField = ({ id, val, className = "", calib }: { id: string, val: any, 
   );
 };
 
-export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev }) => {
+export const RegistryView: React.FC<Props> = ({ student: currentStudent, allStudents, onBack, onNext, onPrev }) => {
   const ref = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({ contentRef: ref });
   const [currentPage, setCurrentPage] = useState(1);
   const [useOverlay, setUseOverlay] = useState(() => localStorage.getItem('maticna_use_overlay') === 'true');
+  const [printAll, setPrintAll] = useState(false);
   const [calib] = useState<any>(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
@@ -226,9 +227,21 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
     { id: 'skolska_godina_2', label: 'Школска година 2', page: 1 },
     { id: 'grades_subjects', label: 'Списак предмета', page: 1 },
     { id: 'grades_y1', label: 'Оцене I год', page: 1 },
+    { id: 'hdr_y1_razred', label: 'Разред римски (I год - оцене)', page: 1 },
+    { id: 'hdr_y1_god1', label: 'Школска год 1 (I год - оцене)', page: 1 },
+    { id: 'hdr_y1_god2', label: 'Школска год 2 (I год - оцене)', page: 1 },
     { id: 'grades_y2', label: 'Оцене II год', page: 1 },
+    { id: 'hdr_y2_razred', label: 'Разред римски (II год - оцене)', page: 1 },
+    { id: 'hdr_y2_god1', label: 'Школска год 1 (II год - оцене)', page: 1 },
+    { id: 'hdr_y2_god2', label: 'Школска год 2 (II год - оцене)', page: 1 },
     { id: 'grades_y3', label: 'Оцене III год', page: 1 },
+    { id: 'hdr_y3_razred', label: 'Разред римски (III год - оцене)', page: 1 },
+    { id: 'hdr_y3_god1', label: 'Школска год 1 (III год - оцене)', page: 1 },
+    { id: 'hdr_y3_god2', label: 'Школска год 2 (III год - оцене)', page: 1 },
     { id: 'grades_y4', label: 'Оцене IV год', page: 1 },
+    { id: 'hdr_y4_razred', label: 'Разред римски (IV год - оцене)', page: 1 },
+    { id: 'hdr_y4_god1', label: 'Школска год 1 (IV год - оцене)', page: 1 },
+    { id: 'hdr_y4_god2', label: 'Школска год 2 (IV год - оцене)', page: 1 },
     { id: 'back_class_roman', label: 'Разред римски (I год)', page: 2 },
     { id: 'back_skolska_godina_1', label: 'Школска година 1 (I год)', page: 2 },
     { id: 'back_skolska_godina_2', label: 'Школска година 2 (I год)', page: 2 },
@@ -251,7 +264,6 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
     { id: 'back_napomena', label: 'Напомена', page: 2 },
   ];
 
-  const subjects = getAllSubjects(student, addEmptyRows);
   const years = [1, 2, 3, 4];
 
   return (
@@ -259,7 +271,7 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
       <div className="rv-toolbar no-print">
         <div className="rv-t-left">
           <button className="btn-icon" onClick={onBack} title="Назад"><ArrowLeft size={20}/></button>
-          <h1>{student.prezime} {student.ime} (Страна {currentPage})</h1>
+          <h1>{currentStudent.prezime} {currentStudent.ime} (Страна {currentPage})</h1>
         </div>
         <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '10px' }}>
           <button className="btn-small" onClick={onPrev} disabled={!onPrev} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
@@ -270,6 +282,12 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
           </button>
         </div>
         <div className="rv-t-actions">
+          {allStudents && allStudents.length > 0 && (
+            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.85rem', marginRight: '10px', background: 'rgba(0,0,0,0.1)', padding: '5px 10px', borderRadius: '4px' }}>
+              <input type="checkbox" checked={printAll} onChange={e => setPrintAll(e.target.checked)} />
+              Штампај све ({allStudents.length})
+            </label>
+          )}
           <span className="zoom-info no-print">{Math.round(previewScale * 100)}%</span>
           <button className="btn-small" onClick={() => setCurrentPage(currentPage === 1 ? 2 : 1)}>Страна {currentPage === 1 ? 2 : 1}</button>
           <button className={`btn-small ${useOverlay ? 'active' : ''}`} onClick={() => { setUseOverlay(!useOverlay); localStorage.setItem('maticna_use_overlay', (!useOverlay).toString()); }}>{useOverlay ? 'Само подаци' : 'Цела страна'}</button>
@@ -332,21 +350,28 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
         </div>
 
         <div ref={ref} className={`rv-print-area ${useOverlay ? 'overlay-mode' : ''}`}>
-           {useOverlay ? (
-             <div 
-               className="a3-page overlay-canvas"
-               style={{ 
-                 transform: `scale(${previewScale})`, 
-                 transformOrigin: 'center top' 
-               }}
-             >
-                <img 
-                  src={`/obrazac_bg_page${currentPage}.jpg`} 
-                  className="overlay-bg-ref no-print" 
-                  alt="" 
-                  onError={(e) => (e.target as HTMLImageElement).style.display = 'none'} 
-                />
-                {currentPage === 1 ? (
+          {(printAll && allStudents ? allStudents : [currentStudent]).map((student, sIdx, sArr) => {
+            const subjects = getAllSubjects(student, addEmptyRows);
+            return (
+              <React.Fragment key={sIdx}>
+                {useOverlay ? (
+                  <div 
+                    className="a3-page overlay-canvas"
+                    style={{ 
+                      transform: `scale(${previewScale})`, 
+                      transformOrigin: 'center top',
+                      pageBreakAfter: sIdx === sArr.length - 1 ? 'auto' : 'always',
+                      marginBottom: sIdx === sArr.length - 1 ? 0 : '20px',
+                      position: 'relative'
+                    }}
+                  >
+                    <img 
+                      src={`/obrazac_bg_page${currentPage}.jpg`} 
+                      className="overlay-bg-ref no-print" 
+                      alt="" 
+                      onError={(e) => (e.target as HTMLImageElement).style.display = 'none'} 
+                    />
+                    {currentPage === 1 ? (
                   <>
                     {!hiddenFields.has('hdr_broj_combined') && <CalibField calib={calib} id="hdr_broj_combined" val={(student.brObrasca || '').split('/').join('')} className="monospace" />}
                     {!hiddenFields.has('hdr_reg') && <CalibField calib={calib} id="hdr_reg" val={student.brojURegistru} />}
@@ -553,7 +578,9 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
                style={{ 
                  padding: '20mm',
                  transform: `scale(${previewScale})`, 
-                 transformOrigin: 'center top' 
+                 transformOrigin: 'center top',
+                 pageBreakAfter: sIdx === sArr.length - 1 ? 'auto' : 'always',
+                 marginBottom: sIdx === sArr.length - 1 ? 0 : '20px'
                }}
              >
                 <h2 style={{ textAlign: 'center' }}>Матична књига - Цео лист</h2>
@@ -573,9 +600,12 @@ export const RegistryView: React.FC<Props> = ({ student, onBack, onNext, onPrev 
                         </tr>
                       ))}
                    </tbody>
-                </table>
+                 </table>
              </div>
            )}
+           </React.Fragment>
+           );
+          })}
         </div>
       </div>
     </div>
